@@ -25,7 +25,7 @@ export const PROJECT_MEDIA: Record<string, string> = {
 };
 
 /** Repos que no se muestran en el portafolio. */
-export const HIDDEN: string[] = ['L0V3'];
+export const HIDDEN: string[] = ['L0V3', 'NaN'];
 
 export const SOCIAL = [
   { label: 'GitHub', href: `https://github.com/${GITHUB_USER}`, icon: true },
