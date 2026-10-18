@@ -1,0 +1,323 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Contact from '../components/Contact.astro';
+import { getProjects } from '../lib/github';
+import { PINNED, PROJECT_MEDIA, SITE } from '../config';
+
+let projects: Awaited<ReturnType<typeof getProjects>> = [];
+let error: string | null = null;
+
+try {
+  projects = await getProjects();
+} catch (e) {
+  if (!import.meta.env.DEV) throw e;
+  error = e instanceof Error ? e.message : String(e);
+}
+
+const featuredProject = projects.find((project) => PINNED.includes(project.name)) ?? projects[0];
+const featuredIndex = featuredProject ? projects.indexOf(featuredProject) : -1;
+const projectId = (name: string) => `obra-${encodeURIComponent(name.toLowerCase())}`;
+const publishedCount = projects.length;
+---
+
+<Layout>
+  <main id="contenido" class="mx-auto w-full max-w-[1600px] px-5 sm:px-8 lg:px-12">
+    <section class="hero-stage" aria-label="Presentación">
+      <h1 class="hero-brand"><img src={SITE.logo} alt="NaN" width="1056" height="1056" fetchpriority="high" /><span class="sr-only">Páginas web y herramientas hechas para resolver necesidades reales</span></h1>
+      <div class="hero-bottom">
+        <p class="hero-summary" data-reveal>
+          Páginas web y herramientas a medida.<br />De la idea inicial a una solución lista para usar.
+        </p>
+        <a href="#contacto" class="hero-action" data-reveal>Conversemos <span aria-hidden="true">↗</span></a>
+      </div>
+    </section>
+
+    <section id="proyectos" class="min-h-svh scroll-mt-0 pb-24 pt-8 sm:pb-32" aria-labelledby="work-title">
+      <div class="mb-10">
+        <div>
+          <h2 id="work-title" class="section-title work-title" data-reveal data-motion="work-title">Proyectos.</h2>
+          <p class="mt-4 max-w-2xl text-base leading-relaxed text-ink-300 sm:text-lg" data-reveal style="--reveal-delay:80ms">
+            Ejemplos de páginas y herramientas creadas para resolver necesidades concretas.
+          </p>
+        </div>
+      </div>
+
+      {error ? (
+        <div class="bg-ink-900/70 p-6 sm:p-8" role="status">
+          <p class="text-lg font-medium text-ink-100">No pudimos cargar los proyectos.</p>
+          <p class="mt-2 max-w-xl text-base leading-relaxed text-ink-300">
+            Inténtalo de nuevo más tarde.
+          </p>
+        </div>
+      ) : projects.length === 0 ? (
+        <div class="bg-ink-900/70 p-6 sm:p-8" role="status">
+          <p class="text-lg font-medium text-ink-100">Aún no hay proyectos para mostrar.</p>
+        </div>
+      ) : (
+        <div class="project-explorer" data-project-explorer data-initial-project={projectId(featuredProject!.name)}>
+          {projects.length > 4 && <div class="mb-8 flex flex-col gap-5" data-enhance-only hidden>
+            <label class="flex flex-col gap-2 text-sm text-ink-300 sm:max-w-lg">
+              <span>Buscar un proyecto</span>
+              <input
+                type="search"
+                data-project-search
+                placeholder="Escribe un nombre o una palabra clave"
+                autocomplete="off"
+                class="min-h-12 rounded-md border border-ink-700 bg-ink-900 px-4 text-base text-ink-100 placeholder:text-ink-400 focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              />
+            </label>
+          </div>}
+
+          <div class="grid gap-8 lg:grid-cols-[minmax(15rem,0.8fr)_minmax(0,1.2fr)] lg:gap-14">
+            <div>
+              {projects.length > 4 && <p class="mb-4 text-base text-ink-300" data-project-results role="status" aria-live="polite" aria-atomic="true">
+                {publishedCount} {publishedCount === 1 ? 'proyecto' : 'proyectos'} disponibles
+              </p>}
+              <nav id="project-list" aria-label="Explorar proyectos" data-reveal data-motion="project-list">
+                <ul class="project-list">
+                  {projects.map((project, index) => {
+                    const id = projectId(project.name);
+                    const searchable = [project.name, project.description]
+                      .filter(Boolean)
+                      .join(' ')
+                      .toLocaleLowerCase('es');
+                    return (
+                      <li data-project-item data-project-id={id} data-search-text={searchable}>
+                        <a
+                          href={`#${id}`}
+                          data-project-choice={id}
+                          aria-current={index === featuredIndex ? 'true' : undefined}
+                          class="project-choice"
+                        >
+                          <span class="project-choice-name block min-w-0 break-words font-semibold text-ink-100">{project.name}</span>
+                          <span aria-hidden="true" class="project-arrow text-ink-400">↗</span>
+                        </a>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </nav>
+              {projects.length > 4 && <p class="mt-5 text-sm leading-relaxed text-ink-400" data-project-empty hidden>
+                No encontramos proyectos con esa búsqueda. Prueba con otro nombre o término.
+              </p>}
+            </div>
+
+            <div class="min-w-0" data-project-panels data-reveal data-motion="project-panels">
+              {projects.map((project, index) => {
+                const id = projectId(project.name);
+                return (
+                  <article id={id} data-project-panel={id} class="project-detail" aria-labelledby={`${id}-title`} hidden={index !== featuredIndex}>
+                    <button type="button" data-project-back class="mb-6 inline-flex min-h-11 items-center text-sm text-ink-300 underline decoration-ink-700 underline-offset-4 transition-colors hover:text-accent hover:decoration-accent lg:hidden">
+                      ← Cambiar proyecto
+                    </button>
+                    <div class={`project-cover project-cover-${index % 3} ${project.name === 'CodeLens' ? 'project-cover-codelens' : ''}`} aria-hidden="true">
+                      {PROJECT_MEDIA[project.name] && <img src={PROJECT_MEDIA[project.name]} alt="" width="120" height="120" loading="lazy" />}
+                      <strong>{project.name}</strong>
+                    </div>
+                    <div class="project-detail-body">
+                      <h3 id={`${id}-title`} class="sr-only">{project.name}</h3>
+                      {project.description && <p class="max-w-2xl text-base leading-relaxed text-ink-300 sm:text-lg">{project.description}</p>}
+                      <div class="mt-4 flex flex-wrap gap-3">
+                        {project.homepage && (
+                          <a href={project.homepage} target="_blank" rel="noopener noreferrer" class="inline-flex min-h-11 items-center rounded-md bg-ink-100 px-4 py-2.5 text-sm font-semibold text-ink-950 transition-colors hover:bg-white">
+                            Visitar sitio ↗
+                          </a>
+                        )}
+                        <button type="button" data-contact-project={project.name} class="inline-flex min-h-11 items-center rounded-md px-0 py-2.5 text-sm font-medium text-ink-300 underline decoration-ink-700 underline-offset-4 transition-colors hover:text-accent hover:decoration-accent">
+                          ¿Tienes algo parecido en mente? Usa este proyecto como referencia
+                        </button>
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          </div>
+          <p class="sr-only" data-project-announcement aria-live="polite" aria-atomic="true"></p>
+        </div>
+      )}
+    </section>
+
+    <section id="sobre-mi" class="about-section scroll-mt-0" aria-labelledby="about-title">
+      <header class="about-heading">
+        <h2 id="about-title" class="about-title" data-reveal data-motion="about-title">
+          <span class="about-title-line"><span>Ideas claras.</span></span>
+          <span class="about-title-line"><span>Soluciones útiles.</span></span>
+        </h2>
+        <p class="about-intro" data-reveal data-motion="about-intro">
+          Páginas web y herramientas creadas para resolver lo que necesitas, de principio a fin.
+        </p>
+      </header>
+
+      <div class="about-capabilities">
+        <div class="about-rail" data-reveal data-motion="about-rail" aria-hidden="true">
+          <span class="about-rail-line"></span>
+          <img class="about-mark" src="/nan-symbol-mark.png" alt="" width="128" height="128" loading="lazy" />
+        </div>
+        <div class="about-grid">
+          <article class="about-capability" data-reveal data-motion="about-capability">
+            <p class="about-discipline">Páginas web</p>
+            <h3>Tu proyecto, bien presentado</h3>
+            <p class="about-description">Una página clara y fácil de recorrer, para que tus clientes encuentren lo que buscan.</p>
+          </article>
+          <article class="about-capability" data-reveal data-motion="about-capability">
+            <p class="about-discipline">Software a medida</p>
+            <h3>Menos pasos, más claridad</h3>
+            <p class="about-description">Una herramienta hecha para simplificar tareas y ajustarse a tu forma de trabajar.</p>
+          </article>
+          <article class="about-capability" data-reveal data-motion="about-capability">
+            <p class="about-discipline">Acompañamiento</p>
+            <h3>De principio a fin</h3>
+            <p class="about-description">Te acompaño desde la primera conversación hasta tener una solución lista para usar.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <Contact />
+  </main>
+
+  <script>
+    const hero = document.querySelector<HTMLElement>('.hero-stage');
+    const logo = hero?.querySelector<HTMLImageElement>('.hero-brand img');
+    if (hero && logo) {
+      const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+      let frame = 0;
+      const updateLogo = () => {
+        frame = 0;
+        const progress = Math.min(1, Math.max(0, scrollY / hero.offsetHeight));
+        if (progress === 0 && !logo.classList.contains('logo-scroll-controlled')) return;
+        logo.classList.add('logo-scroll-controlled');
+        logo.style.opacity = String(1 - progress);
+        logo.style.transform = reducedMotion.matches ? 'none' : `translate3d(${Math.round(progress * innerWidth * 0.9)}px, 0, 0)`;
+      };
+      const scheduleLogo = () => {
+        if (!frame) frame = requestAnimationFrame(updateLogo);
+      };
+      if (scrollY > 0) scheduleLogo();
+      addEventListener('scroll', scheduleLogo, { passive: true });
+      addEventListener('resize', scheduleLogo);
+      addEventListener('pageshow', scheduleLogo);
+      reducedMotion.addEventListener('change', scheduleLogo);
+    }
+
+    const explorer = document.querySelector<HTMLElement>('[data-project-explorer]');
+    const composer = document.querySelector<HTMLElement>('[data-contact-composer]');
+
+    if (explorer) {
+      const enhancement = explorer.querySelector<HTMLElement>('[data-enhance-only]');
+      const search = explorer.querySelector<HTMLInputElement>('[data-project-search]');
+      const items = Array.from(explorer.querySelectorAll<HTMLElement>('[data-project-item]'));
+      const choices = Array.from(explorer.querySelectorAll<HTMLAnchorElement>('[data-project-choice]'));
+      const panels = Array.from(explorer.querySelectorAll<HTMLElement>('[data-project-panel]'));
+      const empty = explorer.querySelector<HTMLElement>('[data-project-empty]');
+      const resultCount = explorer.querySelector<HTMLElement>('[data-project-results]');
+      const announcement = explorer.querySelector<HTMLElement>('[data-project-announcement]');
+      const normalize = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('es');
+      let selectedId = explorer.dataset.initialProject ?? choices[0]?.dataset.projectChoice ?? '';
+
+      const selectProject = (id: string, announce = true, revealPanel = false) => {
+        const choice = choices.find((item) => item.dataset.projectChoice === id);
+        const panel = panels.find((item) => item.dataset.projectPanel === id);
+        if (!choice || !panel) return;
+        selectedId = id;
+        choices.forEach((item) => {
+          if (item.dataset.projectChoice === id) item.setAttribute('aria-current', 'true');
+          else item.removeAttribute('aria-current');
+        });
+        const changed = panel.hidden;
+        panels.forEach((item) => { item.hidden = item !== panel; });
+        if (changed && announce && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          panel.animate(
+            [{ opacity: 0, transform: 'translate3d(18px, 0, 0)' }, { opacity: 1, transform: 'none' }],
+            { duration: 320, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' }
+          );
+        }
+        if (announce && announcement) {
+          const title = panel.querySelector('h3')?.textContent?.trim() ?? 'Proyecto';
+          announcement.textContent = `${title} seleccionado.`;
+        }
+        if (revealPanel && matchMedia('(max-width: 1023px)').matches) {
+          requestAnimationFrame(() => panel.scrollIntoView({
+            behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+            block: 'start',
+          }));
+        }
+      };
+
+      const filterProjects = () => {
+        const term = normalize(search?.value.trim() ?? '');
+        const visible = items.filter((item) => {
+          const match = normalize(item.dataset.searchText ?? '').includes(term);
+          item.hidden = !match;
+          return match;
+        });
+
+        if (resultCount) {
+          resultCount.textContent = term
+            ? `${visible.length} ${visible.length === 1 ? 'resultado' : 'resultados'}`
+            : `${visible.length} ${visible.length === 1 ? 'proyecto' : 'proyectos'} disponibles`;
+        }
+        if (empty) empty.hidden = visible.length > 0;
+        if (visible.length === 0) {
+          panels.forEach((panel) => { panel.hidden = true; });
+          return;
+        }
+        if (!visible.some((item) => item.dataset.projectId === selectedId)) {
+          selectProject(visible[0].dataset.projectId ?? '', false);
+        } else {
+          selectProject(selectedId, false);
+        }
+      };
+
+      if (choices.length && panels.length) {
+        if (enhancement) enhancement.hidden = false;
+        selectProject(selectedId, false);
+
+        choices.forEach((choice) => {
+          choice.addEventListener('click', (event) => {
+            event.preventDefault();
+            selectProject(choice.dataset.projectChoice ?? '', true, true);
+          });
+          choice.addEventListener('keydown', (event) => {
+            const visibleChoices = choices.filter((item) => !item.closest('[data-project-item]')?.hidden);
+            const current = visibleChoices.indexOf(choice);
+            let next = current;
+            if (event.key === 'ArrowDown') next = Math.min(visibleChoices.length - 1, current + 1);
+            else if (event.key === 'ArrowUp') next = Math.max(0, current - 1);
+            else if (event.key === 'Home') next = 0;
+            else if (event.key === 'End') next = visibleChoices.length - 1;
+            else return;
+            event.preventDefault();
+            visibleChoices[next]?.focus();
+            selectProject(visibleChoices[next]?.dataset.projectChoice ?? '', true, true);
+          });
+        });
+        search?.addEventListener('input', filterProjects);
+        explorer.addEventListener('click', (event) => {
+          const back = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-project-back]');
+          if (back) {
+            const selectedChoice = choices.find((choice) => choice.dataset.projectChoice === selectedId);
+            document.querySelector('#project-list')?.scrollIntoView({
+              behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+              block: 'start',
+            });
+            selectedChoice?.focus({ preventScroll: true });
+            return;
+          }
+          const trigger = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-contact-project]');
+          if (!trigger || !composer) return;
+          const selectedPanel = panels.find((panel) => panel.querySelector('h3')?.textContent?.trim() === trigger.dataset.contactProject);
+          if (selectedPanel) {
+            selectProject(selectedPanel.dataset.projectPanel ?? '');
+            composer.dataset.projectContext = selectedPanel.querySelector('h3')?.textContent?.trim() ?? '';
+            composer.dataset.projectDescription = selectedPanel.querySelector('p')?.textContent?.trim() ?? '';
+            composer.dispatchEvent(new Event('portfolio:context', { bubbles: true }));
+          }
+          document.querySelector('#contacto')?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+          composer.querySelector<HTMLTextAreaElement>('[data-brief]')?.focus({ preventScroll: true });
+        });
+      }
+    }
+  </script>
+</Layout>

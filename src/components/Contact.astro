@@ -1,0 +1,363 @@
+---
+import { SITE, WHATSAPP } from '../config';
+
+const initialMessage = [
+  'Hola, te escribo desde el portafolio de NaN.',
+  'Me gustaría conversar sobre una idea y explorar opciones.',
+  '',
+  'La idea o problema es: Todavía estoy definiendo la idea.',
+].join('\n');
+const initialWhatsapp = new URL(`https://wa.me/${WHATSAPP}`);
+initialWhatsapp.searchParams.set('text', initialMessage);
+---
+
+<section id="contacto" class="flex min-h-svh scroll-mt-0 flex-col justify-center py-12 sm:py-16 lg:justify-start" aria-labelledby="contact-title">
+  <div class="grid gap-10 lg:grid-cols-[minmax(0,0.75fr)_minmax(0,1.25fr)] lg:items-center lg:gap-20">
+    <div class="contact-intro" data-reveal data-motion="contact-intro">
+      <h2 id="contact-title" class="max-w-xl text-[clamp(2.5rem,7vw,5rem)] font-semibold leading-[0.96] tracking-[-0.045em]">
+        Hablemos de tu idea.
+      </h2>
+      <p class="mt-6 max-w-lg text-lg leading-relaxed text-ink-300">
+        Coordinemos lo esencial de tu proyecto.
+      </p>
+    </div>
+
+    <form action={`https://formsubmit.co/${SITE.email}`} method="POST" novalidate class="bg-ink-900/70 p-6 sm:p-8 lg:mt-8 lg:p-10" data-reveal data-motion="contact-form" style="--reveal-delay:100ms" data-contact-composer data-whatsapp={WHATSAPP} data-email={SITE.email}>
+      <input type="hidden" name="_subject" value="Nueva consulta desde NaN" />
+      <input type="hidden" name="reference" data-project-reference value="" />
+      <input type="text" name="_honey" class="sr-only" tabindex="-1" autocomplete="off" aria-hidden="true" />
+      <fieldset>
+        <legend class="text-lg font-medium text-ink-100">¿Qué te gustaría hacer?</legend>
+        <div class="clear-kind-row" data-clear-kind-row data-selected="false" inert>
+          <div>
+            <button type="button" data-clear-project-kind class="min-h-11 text-sm text-ink-300 underline decoration-ink-700 underline-offset-4 transition-colors hover:text-accent hover:decoration-accent">
+              Quitar selección
+            </button>
+          </div>
+        </div>
+        <div class="mt-4 flex flex-wrap gap-2">
+          <label class="service-option">
+            <input class="peer sr-only" type="radio" name="project-kind" value="una página web" />
+            <span class="service-chip">Una página web</span>
+          </label>
+          <label class="service-option">
+            <input class="peer sr-only" type="radio" name="project-kind" value="una herramienta a medida" />
+            <span class="service-chip">Una herramienta a medida</span>
+          </label>
+          <label class="service-option">
+            <input class="peer sr-only" type="radio" name="project-kind" value="mejorar un proyecto que ya existe" />
+            <span class="service-chip">Mejorar algo existente</span>
+          </label>
+        </div>
+      </fieldset>
+
+      <label for="project-brief" class="mt-8 flex flex-col gap-2 text-base text-ink-300">
+        <span>Sobre el proyecto</span>
+        <textarea
+          id="project-brief"
+          data-brief
+          name="message"
+          rows="5"
+          placeholder="Describe la idea o necesidad en pocas palabras."
+          class="min-h-36 w-full resize-none rounded-md border border-ink-700 bg-ink-950 px-4 py-3 text-base leading-relaxed text-ink-100 placeholder:text-ink-400 focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        ></textarea>
+      </label>
+
+      <label for="contact-email" class="mt-5 flex flex-col gap-2 text-base text-ink-300">
+        <span>Tu correo, para responderte</span>
+        <input id="contact-email" data-contact-email name="email" type="email" autocomplete="email" required pattern="[^@\\s]+@(?:[^@\\s.]+\\.)+[^@\\s.]{2,}" aria-describedby="contact-email-error" aria-invalid="false" placeholder="tu@correo.com" class="min-h-12 w-full rounded-md border border-ink-700 bg-ink-950 px-4 py-3 text-base text-ink-100 placeholder:text-ink-400 focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent" />
+        <div class="contact-notice" data-email-error-row data-visible="false" aria-hidden="true" inert>
+          <div><p id="contact-email-error" data-email-error class="m-0 text-sm text-rose-300" role="alert"></p></div>
+        </div>
+      </label>
+
+      <div class="contact-notice mt-2" data-project-context-row data-visible="false" aria-hidden="true" inert>
+        <div>
+          <div class="flex flex-wrap items-center justify-between gap-3 rounded-sm bg-ink-800 px-4 py-3 text-sm leading-relaxed text-ink-300" data-project-context>
+            <p data-project-context-copy></p>
+            <button type="button" data-clear-project-context class="min-h-11 shrink-0 underline decoration-ink-400 underline-offset-4 transition-colors hover:text-accent hover:decoration-accent">
+              Quitar referencia
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-6 flex flex-wrap gap-3">
+        <button
+          type="submit"
+          data-email-send
+          aria-label="Enviar por correo"
+          class="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-accent px-5 py-3 text-base font-semibold text-ink-950 transition-[transform,background-color] duration-200 hover:bg-white active:translate-y-px"
+        >
+          Enviar <span aria-hidden="true">↗</span>
+        </button>
+        <a href={initialWhatsapp.toString()} data-whatsapp-link target="_blank" rel="noopener noreferrer" class="whatsapp-button inline-flex min-h-12 items-center justify-center gap-2 rounded-md px-5 py-3 text-base font-semibold">
+          Enviar por WhatsApp
+          <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z" />
+          </svg>
+        </a>
+      </div>
+      <div class="contact-notice" data-contact-status-row data-visible="false" aria-hidden="true" inert>
+        <div class="pt-3"><p class="m-0 text-sm text-ink-300" data-contact-status role="status" aria-live="polite" aria-atomic="true"></p></div>
+      </div>
+    </form>
+  </div>
+</section>
+
+<script>
+  const composer = document.querySelector<HTMLFormElement>('[data-contact-composer]');
+
+  if (composer) {
+    const brief = composer.querySelector<HTMLTextAreaElement>('[data-brief]');
+    const emailField = composer.querySelector<HTMLInputElement>('[data-contact-email]');
+    const emailError = composer.querySelector<HTMLElement>('[data-email-error]');
+    const emailErrorRow = composer.querySelector<HTMLElement>('[data-email-error-row]');
+    const whatsapp = composer.querySelector<HTMLAnchorElement>('[data-whatsapp-link]');
+    const sendButton = composer.querySelector<HTMLButtonElement>('[data-email-send]');
+    const referenceField = composer.querySelector<HTMLInputElement>('[data-project-reference]');
+    const clearContextButton = composer.querySelector<HTMLButtonElement>('[data-clear-project-context]');
+    const clearKindButton = composer.querySelector<HTMLButtonElement>('[data-clear-project-kind]');
+    const clearKindRow = composer.querySelector<HTMLElement>('[data-clear-kind-row]');
+    const status = composer.querySelector<HTMLElement>('[data-contact-status]');
+    const statusRow = composer.querySelector<HTMLElement>('[data-contact-status-row]');
+    const contextRow = composer.querySelector<HTMLElement>('[data-project-context-row]');
+    const contextNote = composer.querySelector<HTMLElement>('[data-project-context]');
+    const radios = Array.from(composer.querySelectorAll<HTMLInputElement>('input[name="project-kind"]'));
+
+    const makeMessage = () => {
+      const selectedKind = radios.find((radio) => radio.checked)?.value ?? '';
+      const description = brief?.value.trim() || 'Todavía estoy definiendo la idea.';
+      const project = composer?.dataset.projectContext;
+      const lines = [
+        `Hola, te escribo desde el portafolio de NaN.`,
+        selectedKind ? `Me interesa conversar sobre ${selectedKind}.` : 'Me gustaría conversar sobre una idea y explorar opciones.',
+        '',
+        `La idea o problema es: ${description}`,
+      ];
+      if (project) lines.push('', `Proyecto que me dio el punto de partida: ${project}.`);
+      return lines.join('\n');
+    };
+
+    const updateMessage = () => {
+      const message = makeMessage();
+      if (whatsapp) {
+        const url = new URL(`https://wa.me/${composer?.dataset.whatsapp}`);
+        url.searchParams.set('text', message);
+        whatsapp.href = url.toString();
+      }
+    };
+
+    let emailErrorTimer: number | undefined;
+    let contextTimer: number | undefined;
+    const setNoticeVisible = (row: HTMLElement | null, visible: boolean) => {
+      if (!row) return;
+      row.inert = !visible;
+      row.setAttribute('aria-hidden', String(!visible));
+      if (visible) requestAnimationFrame(() => {
+        if (!row.inert) row.dataset.visible = 'true';
+      });
+      else row.dataset.visible = 'false';
+    };
+
+    const setEmailError = (message: string) => {
+      if (!emailError) return;
+      window.clearTimeout(emailErrorTimer);
+      if (message) {
+        emailError.textContent = message;
+        setNoticeVisible(emailErrorRow, true);
+        return;
+      }
+      if (!emailErrorRow || emailErrorRow.dataset.visible !== 'true') return;
+      setNoticeVisible(emailErrorRow, false);
+      emailErrorTimer = window.setTimeout(() => {
+        if (emailErrorRow.dataset.visible === 'false') emailError.textContent = '';
+      }, 250);
+    };
+
+    const showStatus = (message: string) => {
+      if (status) status.textContent = message;
+      setNoticeVisible(statusRow, true);
+    };
+
+    const updateEmailError = () => {
+      if (!emailField || !emailError) return emailField?.validity.valid ?? true;
+      if (emailField.validity.valid) {
+        emailField.setAttribute('aria-invalid', 'false');
+        setEmailError('');
+        return true;
+      }
+      emailField.setAttribute('aria-invalid', 'true');
+      setEmailError(emailField.validity.valueMissing
+        ? 'Completa tu correo para poder responderte.'
+        : 'Revisa el formato del correo.');
+      return false;
+    };
+
+    const updateKindSelection = () => {
+      const selected = radios.some((radio) => radio.checked);
+      if (clearKindRow) {
+        clearKindRow.dataset.selected = String(selected);
+        clearKindRow.inert = !selected;
+      }
+    };
+
+    const updateContext = () => {
+      const project = composer?.dataset.projectContext;
+      if (referenceField) referenceField.value = project ?? '';
+      if (contextNote) {
+        window.clearTimeout(contextTimer);
+        const copy = contextNote.querySelector<HTMLElement>('[data-project-context-copy]');
+        if (project) {
+          if (copy) copy.textContent = `Usaremos “${project}” como referencia para iniciar la conversación.`;
+          setNoticeVisible(contextRow, true);
+        } else {
+          setNoticeVisible(contextRow, false);
+          contextTimer = window.setTimeout(() => {
+            if (contextRow?.dataset.visible === 'false' && copy) copy.textContent = '';
+          }, 250);
+        }
+      }
+      updateMessage();
+    };
+
+    brief?.addEventListener('input', updateMessage);
+    emailField?.addEventListener('input', () => {
+      emailField.setAttribute('aria-invalid', 'false');
+      setEmailError('');
+    });
+    radios.forEach((radio) => radio.addEventListener('change', () => {
+      updateKindSelection();
+      updateMessage();
+    }));
+    clearKindButton?.addEventListener('click', () => {
+      radios.forEach((radio) => { radio.checked = false; });
+      updateKindSelection();
+      updateMessage();
+    });
+    document.addEventListener('portfolio:context', updateContext);
+    updateKindSelection();
+    updateContext();
+
+    clearContextButton?.addEventListener('click', () => {
+      if (!composer) return;
+      delete composer.dataset.projectContext;
+      delete composer.dataset.projectDescription;
+      composer.dispatchEvent(new Event('portfolio:context', { bubbles: true }));
+      brief?.focus({ preventScroll: true });
+    });
+
+    composer.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!sendButton || sendButton.disabled) return;
+      if (!updateEmailError()) {
+        emailField?.focus();
+        return;
+      }
+      sendButton.disabled = true;
+      showStatus('Enviando mensaje…');
+
+      try {
+        const fields = Object.fromEntries(new FormData(composer));
+        fields.message = makeMessage();
+        const response = await fetch(`https://formsubmit.co/ajax/${composer.dataset.email}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify(fields),
+        });
+        const result = await response.json() as { success?: boolean | string; message?: string };
+        if (!response.ok || (result.success !== true && result.success !== 'true')) {
+          throw new Error(result.message || 'No se pudo enviar el mensaje.');
+        }
+        composer.reset();
+        delete composer.dataset.projectContext;
+        delete composer.dataset.projectDescription;
+        updateKindSelection();
+        updateContext();
+        showStatus('Mensaje recibido. Gracias por escribir.');
+      } catch {
+        showStatus('No se pudo enviar. Inténtalo otra vez o usa WhatsApp.');
+      } finally {
+        sendButton.disabled = false;
+      }
+    });
+
+  }
+</script>
+
+<style>
+  @media (min-width: 1024px) {
+    #contacto {
+      overflow: clip;
+    }
+
+    .contact-intro {
+      position: sticky;
+      top: 6rem;
+      align-self: start;
+    }
+  }
+
+  [data-email-send]:disabled { cursor: wait; opacity: 0.65; }
+  [data-contact-email][aria-invalid="true"] { border-color: #fda4af; }
+  .clear-kind-row,
+  .contact-notice {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: grid-template-rows 240ms cubic-bezier(0.23, 1, 0.32, 1), opacity 180ms cubic-bezier(0.23, 1, 0.32, 1), transform 240ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .clear-kind-row > div,
+  .contact-notice > div { min-height: 0; overflow: hidden; }
+  .clear-kind-row[data-selected="true"],
+  .contact-notice[data-visible="true"] { grid-template-rows: 1fr; opacity: 1; transform: none; }
+
+  .whatsapp-button {
+    background: #25d366;
+    color: var(--color-ink-950);
+    transition: transform 180ms cubic-bezier(0.23, 1, 0.32, 1), background-color 180ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .whatsapp-button:active { transform: translateY(1px); }
+
+  .service-chip {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    border-radius: 4px;
+    background: var(--color-ink-800);
+    padding: 0.65rem 0.9rem;
+    color: var(--color-ink-300);
+    transition: background-color 180ms cubic-bezier(0.23, 1, 0.32, 1), color 180ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .whatsapp-button:hover { background: #43e17c; }
+
+    .service-option:hover .service-chip {
+      background: var(--color-ink-700);
+      color: var(--color-ink-100);
+    }
+  }
+
+  .service-option input:checked + .service-chip {
+    background: var(--color-ink-100);
+    color: var(--color-ink-950);
+  }
+
+  .service-option input:focus-visible + .service-chip {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .service-chip,
+    .clear-kind-row,
+    .contact-notice,
+    .whatsapp-button {
+      transition-duration: 0.01ms;
+    }
+    .contact-notice { transform: none; }
+  }
+</style>
