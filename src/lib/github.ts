@@ -28,7 +28,15 @@ async function gh<T>(path: string): Promise<T> {
   if (token) headers.Authorization = `Bearer ${token}`;
 
   const res = await fetch(`${API}${path}`, { headers, signal: AbortSignal.timeout(10000) });
-  if (!res.ok) throw new Error(`GitHub API ${path} respondió ${res.status}`);
+  if (!res.ok) {
+    const detail = (await res.text()).slice(0, 500).replace(/[^\x20-\x7E]/g, '?');
+    const remaining = res.headers.get('x-ratelimit-remaining') ?? 'unknown';
+    const reset = res.headers.get('x-ratelimit-reset') ?? 'unknown';
+    throw new Error(
+      `GitHub API ${path} returned ${res.status}; token=${token ? 'configured' : 'missing'}; ` +
+      `rate-limit-remaining=${remaining}; rate-limit-reset=${reset}; response=${detail}`
+    );
+  }
   return res.json();
 }
 
